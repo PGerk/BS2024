@@ -8,7 +8,7 @@ struct Node {
 
 typedef struct Node Node;
 
-Node *first = NULL;
+static Node *first = NULL;
 
 static int insertElement(int value) {    
 if(value >= 0)
