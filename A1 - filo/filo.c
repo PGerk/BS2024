@@ -3,7 +3,7 @@
 
 struct Node {
     int data;
-    Node *next;
+    struct Node *next;
 };
 
 typedef struct Node Node;
@@ -11,56 +11,57 @@ typedef struct Node Node;
 static Node *first = NULL;
 
 static int insertElement(int value) {    
-if(value >= 0)
-    {
+	if(value >= 0)
+    	{
 		//Check if this is the first node
-        if(first == NULL)
-        {
-            first = (struct Node *)malloc(sizeof(struct Node));
-            if(first == NULL)
-            {
-                return -1;
-            }
-            else
-            {
-                first->data = value;      
-                first->next = NULL; 
-                return value;
-            }
-        }
+       		if(first == NULL)
+        	{
+            		first = (struct Node *)malloc(sizeof(struct Node));
+            		if(first == NULL)
+            		{
+                		return -1;
+            		}
+            		else
+            		{
+                		first->data = value;      
+                		first->next = NULL; 
+             		   	return value;
+            		}
+        	}
+        	
 		//Any node after the first one
-        else
-        {
-            struct Node *temp;
-            temp = first;
+        	else
+        	{
+            		struct Node *temp;
+            		temp = first;
 
 			//Check if value already exists in stack
 			//Also sets temp to top node of stack
-            while(temp != NULL)
-            {
-                if(temp->data == value) return -1;
-                if(temp->next == NULL) break;
-                temp = temp->next;
-            }
+            		while(temp != NULL)
+           	 	{
+                		if(temp->data == value) return -1;
+                		if(temp->next == NULL) break;
+                		temp = temp->next;
+            		}
             
 			//New Value: Add new Node
-            Node *newNode = NULL;
-            newNode = (struct Node *)malloc(sizeof(struct Node));
+            		Node *newNode = NULL;
+            		newNode = (struct Node *)malloc(sizeof(struct Node));
 			
-            if(newNode == NULL)
-            {
-                return -1;
-            }
-            else
-            {
-                newNode->data = value;
+            		if(newNode == NULL)
+            		{
+                		return -1;
+            		}
+            		else
+            		{
+                		newNode->data = value;
 				//temp is the top node of the stack
-                temp->next = newNode;
-                newNode->next = NULL;
-                return value;
-            }
-        }
-    }
+                		temp->next = newNode;
+                		newNode->next = NULL;
+                		return value;
+            		}
+        	}
+    	}
 	return -1;
 }
 
@@ -92,7 +93,7 @@ static int removeElement(void) {
 		last = last->next;
 	}
 	
-	if(last != NULL and prevLast != NULL)
+	if(last != NULL && prevLast != NULL)
 	{
 		value = last->data;
 		free(last);
