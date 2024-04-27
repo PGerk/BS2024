@@ -65,7 +65,41 @@ if(value >= 0)
 }
 
 static int removeElement(void) {
-	// TODO: implement me!
+	
+	//head does not exist (list empty)
+	if (first == NULL) return -1;
+	
+	int value;
+	
+	//only head remains
+	if (first->next == NULL)
+	{
+		value = first->data;
+		free(first);
+		return value;
+	}
+	
+	Node *last = NULL;
+	last = first->next;
+	
+	Node *prevLast = NULL;
+	prevLast = first;
+	
+	//find newest two nodes
+	while (last->next)
+	{
+		prevLast = last;
+		last = last->next;
+	}
+	
+	if(last != NULL and prevLast != NULL)
+	{
+		value = last->data;
+		free(last);
+		prevLast->next = NULL;
+		return value;
+	}
+	
 	return -1;
 }
 
