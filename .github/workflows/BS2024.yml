@@ -1,0 +1,30 @@
+name: BS2024 CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Compiler Setup
+      run: sudo apt-get install -y gcc make
+    
+    - name: Compile A1
+      run: gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o filo "A1 - filo/filo.c"
+      
+    - name: Compile A2
+      run: gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o wsort "A2 - wsort/wsort.c"
+      
+    - name: Compile A3
+      run: |
+        ls "A3 - clash"
+        make
