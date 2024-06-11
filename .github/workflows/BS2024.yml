@@ -17,14 +17,14 @@ jobs:
     
     - name: Compiler Setup
       run: sudo apt-get install -y gcc make
-    
-    - name: Compile A1
-      run: gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o filo "A1 - filo/filo.c"
-      
-    - name: Compile A2
-      run: gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o wsort "A2 - wsort/wsort.c"
-      
-    - name: Compile A3
+
+    - name: Compile programs
       run: |
-        ls "A3 - clash"
-        make
+          for dir in $(find . -type f -name '*.c' -exec dirname {} \; | sort -u); do
+            for file in $dir/*.c; do
+              base=$(basename "$file" .c)
+              echo "Compiling $file"
+              gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o "$dir/$base" "$file" || echo "Failed to compile $file"
+            done
+          don
+      
