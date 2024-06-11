@@ -20,10 +20,12 @@ jobs:
 
     - name: Compile programs
       run: |
-          for dir in $(find . -type f -name '*.c' -exec dirname {} \; | sort -u); do
-            for file in $dir/*.c; do
+          # Find all directories containing .c files
+          while IFS= read -r -d '' dir; do
+            echo "Compiling programs in $dir"
+            while IFS= read -r -d '' file; do
               base=$(basename "$file" .c)
               echo "Compiling $file"
               gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o "$dir/$base" "$file" || echo "Failed to compile $file"
-            done
-          done
+            done < <(find "$dir" -type f -name '*.c' -print0)
+          done < <(find . -type f -name '*.c' -exec dirname {} \; | sort -u | uniq | xargs -0 -I {} echo {} | tr '\n' '\0')
