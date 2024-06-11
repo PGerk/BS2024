@@ -26,5 +26,4 @@ jobs:
               echo "Compiling $file"
               gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o "$dir/$base" "$file" || echo "Failed to compile $file"
             done
-          don
-      
+          done
