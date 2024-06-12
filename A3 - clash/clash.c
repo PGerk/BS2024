@@ -63,8 +63,10 @@ void execute_command(char *command, int background) {
     //Let's just assume a somewhat sane, but high, number of arguments
     char *args[MAX_INPUT_LEN / 2 + 1];
     int i = 0;
+    
     //Split along Space and Tab
     args[i] = strtok(command, " \t");
+    
     while (args[i] != NULL && i < MAX_INPUT_LEN / 2) {
         i++;
         args[i] = strtok(NULL, " \t");
@@ -81,7 +83,7 @@ void execute_command(char *command, int background) {
             fprintf(stderr, "cd needs an argument\n");
         } else {
             if (chdir(args[1]) != 0) {
-                perror("cd");
+                perror("cd failed");
             }
         }
         return;
