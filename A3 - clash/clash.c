@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,27 +18,28 @@ int main() {
     char input[MAX_INPUT_LEN];
 
     while (1) {
-        // Aktuelles Arbeitsverzeichnis als Prompt anzeigen
+        //Display working directory
         if (getcwd(cwd, sizeof(cwd)) != NULL) {
             printf("%s: ", cwd);
         } else {
-            perror("getcwd");
+            perror("Couldn't read current working directory");
             exit(EXIT_FAILURE);
         }
 
-        // Eingabe lesen
+        //Read input
         if (fgets(input, sizeof(input), stdin) == NULL) {
+            //End of file / STRG+D
             if (feof(stdin)) {
-                break; // EOF (Ctrl-D)
+                break;
             } else {
-                perror("fgets");
-                clearerr(stdin); // Fehlerstatus zurücksetzen
+                perror("Input Error");
+                clearerr(stdin);
                 continue;
             }
         }
 
-        // Eingabe verarbeiten und in Kommandonamen und Argumente zerlegen
-        char *command = strtok(input, "\n"); // Entferne das neue Zeilenzeichen
+        //Process input
+        char *command = strtok(input, "\n");
         if (command == NULL) {
             continue;
         }
@@ -50,10 +50,8 @@ int main() {
             command[strlen(command) - 1] = '\0';
         }
 
-        // Befehl ausführen
         execute_command(command, background);
 
-        // Beendete Hintergrundprozesse aufräumen
         handle_background_processes();
     }
 
@@ -62,21 +60,25 @@ int main() {
 }
 
 void execute_command(char *command, int background) {
-    char *args[MAX_INPUT_LEN / 2 + 1]; // Angenommen, maximal die Hälfte der Eingabe besteht aus Argumenten
+    //Let's just assume a somewhat sane, but high, number of arguments
+    char *args[MAX_INPUT_LEN / 2 + 1];
     int i = 0;
+    //Split along Space and Tab
     args[i] = strtok(command, " \t");
     while (args[i] != NULL && i < MAX_INPUT_LEN / 2) {
         i++;
         args[i] = strtok(NULL, " \t");
     }
 
+    //No command supplied
     if (args[0] == NULL) {
-        return; // Keine Eingabe
+        return;
     }
 
+    //cd command
     if (strcmp(args[0], "cd") == 0) {
         if (args[1] == NULL) {
-            fprintf(stderr, "cd: fehlendes Argument\n");
+            fprintf(stderr, "cd needs an argument\n");
         } else {
             if (chdir(args[1]) != 0) {
                 perror("cd");
@@ -85,33 +87,33 @@ void execute_command(char *command, int background) {
         return;
     }
 
+    //jobs command
     if (strcmp(args[0], "jobs") == 0) {
-        // Funktion zur Anzeige der Hintergrundprozesse aufrufen
         walkList(print_job);
         return;
     }
 
     pid_t pid = fork();
     if (pid < 0) {
-        perror("fork");
+        perror("Fork failed");
         return;
     }
 
     if (pid == 0) {
-        // Kindprozess
+        //Child
         if (execvp(args[0], args) == -1) {
-            perror("execvp");
+            perror("Execution failed");
         }
         exit(EXIT_FAILURE);
     } else {
-        // Elternprozess
+        //Parent
         if (!background) {
             int status;
             waitpid(pid, &status, 0);
-            printf("Exitstatus [%s] = %d\n", command, WEXITSTATUS(status));
+            printf("Exit status [%s] = %d\n", command, WEXITSTATUS(status));
         } else {
             if (insertElement(pid, command) < 0) {
-                fprintf(stderr, "Fehler beim Hinzufügen des Hintergrundprozesses\n");
+                fprintf(stderr, "Element insertion error\n");
             }
         }
     }
@@ -124,12 +126,12 @@ void handle_background_processes() {
 
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         if (removeElement(pid, cmd, sizeof(cmd)) > 0) {
-            printf("Hintergrundprozess beendet: PID %d, Befehl [%s], Exitstatus %d\n", pid, cmd, WEXITSTATUS(status));
+            printf("Finished: PID %d, command [%s], exit status %d\n", pid, cmd, WEXITSTATUS(status));
         }
     }
 }
 
 bool print_job(pid_t pid, const char *cmdLine) {
-    printf("PID: %d, Befehl: %s\n", pid, cmdLine);
+    printf("PID: %d, command: %s\n", pid, cmdLine);
     return false;
 }
