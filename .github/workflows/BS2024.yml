@@ -23,9 +23,15 @@ jobs:
           # Find all directories containing .c files
           while IFS= read -r -d '' dir; do
             echo "Compiling programs in $dir"
-            while IFS= read -r -d '' file; do
-              base=$(basename "$file" .c)
-              echo "Compiling $file"
-              gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o "$dir/$base" "$file" || echo "Failed to compile $file"
-            done < <(find "$dir" -type f -name '*.c' -print0)
+            if [ -f "$dir/make" ]; then
+              echo "Running makefile."
+              make -C "$dir" || echo "Failed to build using makefile in $dir"
+            else
+            
+              while IFS= read -r -d '' file; do
+                base=$(basename "$file" .c)
+                echo "Compiling $file"
+                gcc -std=c11 -pedantic -D_XOPEN_SOURCE=700 -Wall -Werror -o "$dir/$base" "$file" || echo "Failed to compile $file"
+              done < <(find "$dir" -type f -name '*.c' -print0)
+            fi
           done < <(find . -type f -name '*.c' -exec dirname {} \; | sort -u | uniq | xargs -0 -I {} echo {} | tr '\n' '\0')
